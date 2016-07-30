@@ -98,7 +98,8 @@ namespace UnrarMovies
 
             // Detta var nödvändigt för att inte få ssl error på certificate när du kör den via mono....
             ServicePointManager.ServerCertificateValidationCallback = delegate (object s, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) { return true; };
-            OutMail.GmailSend();
+            if (OutMail.TextBody != null)
+                OutMail.GmailSend();
            
          
             

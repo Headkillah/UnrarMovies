@@ -64,7 +64,7 @@ namespace UnrarMovies
 
         public static void CleanUpTheLeftovers()
         {
-            Array.ForEach(Directory.GetFiles(@"/volume1/Media/Filmer/"), File.Delete);
+            Array.ForEach(Directory.GetFiles(@"/volume1/Download/Film/"), File.Delete);
         }
 
 
