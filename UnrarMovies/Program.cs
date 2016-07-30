@@ -24,6 +24,7 @@ namespace UnrarMovies
             UnrarArchives test = new UnrarArchives();
             NameHandler sortName = new NameHandler();
             List<string> MovieNames = new List<string>();
+            CleanUp Cleaner = new CleanUp();
             Gmail OutMail = new Gmail()
             {
                 SendFrom = "",
@@ -62,34 +63,43 @@ namespace UnrarMovies
                 CleanUp.CleanUpSubRars(subsRars);
 
             }
+            System.Threading.Thread.Sleep(9000);
 
+            //string[] filesToMove = Directory.GetFiles(@"c:\test\", "*.*");
+            string[] filesToMove = Directory.GetFiles(@"/volume1/Download/Film/", "*.*");
+            Cleaner.MoveTheFiles(filesToMove, destinationPath);
 
-
+            System.Threading.Thread.Sleep(3000);
+            CleanUp.CleanUpTheLeftovers();
 
             for (int i = 0; i < MovieNames.Count; i++)
             {
-                //Names are bad change fast
-                sortName.StartNameSorting(MovieNames[i]);
-                //Console.WriteLine(sortName.MovieNameOMDB);
-                var json = new WebClient().DownloadString("http://www.omdbapi.com/?t=" + sortName.MovieNameOMDB + "&y=&plot=short&r=json");
-                JsonDeterialize movie = JsonConvert.DeserializeObject<JsonDeterialize>(json);
-                //Console.WriteLine(movie.Title + " " + movie.Genre);
-              
-                OutMail.TextBody += movie.Title + ". Rating : " + movie.imdbRating + " by " +movie.imdbVotes +
-                " voters ."+"Genre : "+movie.Genre+ ". Runtime : " + movie.Runtime;
+                if (Cleaner.CheckIfIShouldMail(MovieNames[i]))
+                {
+                    //Names are bad change fast
+                    sortName.StartNameSorting(MovieNames[i]);
+                    //Console.WriteLine(sortName.MovieNameOMDB);
+                    var json = new WebClient().DownloadString("http://www.omdbapi.com/?t=" + sortName.MovieNameOMDB + "&y=&plot=short&r=json");
+                    JsonDeterialize movie = JsonConvert.DeserializeObject<JsonDeterialize>(json);
+                    //Console.WriteLine(movie.Title + " " + movie.Genre);
+
+                    OutMail.TextBody += movie.Title + ". Rating : " + movie.imdbRating + " by " + movie.imdbVotes +
+                    " voters ." + "Genre : " + movie.Genre + ". Runtime : " + movie.Runtime;
 
 
 
-                OutMail.TextBody += "<tr>";
-                OutMail.TextBody += "<tr>";
+                    OutMail.TextBody += "<tr>";
+                    OutMail.TextBody += "<tr>";
+
+                }
+            
             }
-            //string[] filesToMove = Directory.GetFiles(@"c:\test\", "*.*");
-            string[] filesToMove = Directory.GetFiles(@"/volume1/Download/Film/", "*.*");
-            CleanUp.MoveTheFiles(filesToMove, destinationPath);
+            
 
             // Detta var nödvändigt för att inte få ssl error på certificate när du kör den via mono....
             ServicePointManager.ServerCertificateValidationCallback = delegate (object s, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) { return true; };
             OutMail.GmailSend();
+           
          
             
         }

@@ -9,6 +9,8 @@ namespace UnrarMovies
 {
     class CleanUp
     {
+        
+
         public static bool CleanUpSubRars(string subsRar)
         {
             try
@@ -22,30 +24,49 @@ namespace UnrarMovies
             }
         }
 
+        List<string> MoviesNotToMail = new List<string>();
 
-        public static bool MoveTheFiles(string[] filesToMove, string destinationPath)
+        public bool CheckIfIShouldMail(string inMovieName)
+        {
+       
+            if (MoviesNotToMail.Contains(inMovieName))
+            {
+                return false;
+            }
+            return true;
+        }
+        
+        public void MoveTheFiles(string[] filesToMove, string destinationPath)
         {
             string[] moviesOnNas = Directory.GetFiles(@"/volume1/Media/Filmer/", "*.*");
-
-
+            
+            
             //string destinationPath = (@"C:\temp\");
+
             foreach (var file in filesToMove)
             {
                 //Console.WriteLine(file);
                 var fileName = Path.GetFileName(file);
+                var movieName = Path.GetFileNameWithoutExtension(file);
                 //Console.WriteLine(fileName);
                 if (!moviesOnNas.Contains(@"/volume1/Media/Filmer/"+fileName))
                 {
+                    
                     File.Move(file, destinationPath + fileName);
                 }
-                
-                
-                
+                else
+                {
+                    MoviesNotToMail.Add(movieName);
+                }
             }
-            return true;
-
+            
         }
 
-        
+        public static void CleanUpTheLeftovers()
+        {
+            Array.ForEach(Directory.GetFiles(@"/volume1/Media/Filmer/"), File.Delete);
+        }
+
+
     }
 }
