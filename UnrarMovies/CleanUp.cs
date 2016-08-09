@@ -38,33 +38,52 @@ namespace UnrarMovies
         
         public void MoveTheFiles(string[] filesToMove, string destinationPath)
         {
-            string[] moviesOnNas = Directory.GetFiles(@"/volume1/Media/Filmer/", "*.*");
+            //string[] moviesOnNas = Directory.GetFiles(destinationPath, "*.*");
+            string[] moviesOnNas = Directory.GetFiles(destinationPath, "*.*", SearchOption.AllDirectories);
+
+
             
-            
-            //string destinationPath = (@"C:\temp\");
 
             foreach (var file in filesToMove)
             {
                 //Console.WriteLine(file);
                 var fileName = Path.GetFileName(file);
+                string realPath = GetRealMovieName(file);
                 var movieName = Path.GetFileNameWithoutExtension(file);
+                var ext = Path.GetExtension(file);
+               
                 //Console.WriteLine(fileName);
-                if (!moviesOnNas.Contains(@"/volume1/Media/Filmer/"+fileName))
+                
+                if (!moviesOnNas.Contains(destinationPath+realPath+ext))
                 {
-                    
-                    File.Move(file, destinationPath + fileName);
+                    if(ext != ".rar")
+                    {
+                        File.Move(file, destinationPath + realPath + ext);
+                    }
+                        
+
                 }
                 else
                 {
                     MoviesNotToMail.Add(movieName);
                 }
+
             }
             
         }
 
-        public static void CleanUpTheLeftovers()
+        public string GetRealMovieName(string filePath)
         {
-            Array.ForEach(Directory.GetFiles(@"/volume1/Download/Film/"), File.Delete);
+            string[] directories = filePath.Split(Path.DirectorySeparatorChar);
+            string pathen = directories[directories.Length - 2];
+            return pathen;
+        }
+
+        public static void CleanUpTheLeftovers(string extractFolder)
+        {
+            //Array.ForEach(Directory.GetFiles(@"/volume1/Download/Film/"), File.Delete);
+            Directory.Delete(extractFolder, true);
+            //Array.ForEach(Directory.GetFiles(@"c:\test\", SearchOption.AllDirectories), File.Delete);
         }
 
 

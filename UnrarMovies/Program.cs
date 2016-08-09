@@ -5,6 +5,8 @@ using Newtonsoft.Json;
 using Email;
 using System.Security.Cryptography.X509Certificates;
 using System.Net.Security;
+using System.Linq;
+using System;
 
 namespace UnrarMovies
 {
@@ -14,12 +16,16 @@ namespace UnrarMovies
         {
 
             string destinationPath = (@"/volume1/Media/Filmer/");
-            string path = @"/volume1/Download/Film/";
-            //string path = @"C:\test\";
+            //string destinationPath = @"C:\temp\";
+            string path = @"/volume1/Download/Film/extracting/";
+            //string path = @"C:\test\Download\Film\extracting\";
+            string downloadPath = @"/volume1/Download/Film/";
+            //string downloadPath = @"C:\test\Download\Film\";
 
-            //string[] allFiles = System.IO.Directory.GetFiles(@"C:\test\", "*.rar", System.IO.SearchOption.AllDirectories);
-            string[] allFiles = System.IO.Directory.GetFiles(@"/volume1/Download/Film/", "*.rar", System.IO.SearchOption.AllDirectories);
+            string[] allFiles = System.IO.Directory.GetFiles(downloadPath, "*.rar", System.IO.SearchOption.AllDirectories);
+            //string[] allFiles = System.IO.Directory.GetFiles(downloadPath, "*.rar", System.IO.SearchOption.AllDirectories);
 
+            bool NoRarsThisTime = false;
             FileInfoHandler files = new FileInfoHandler();
             UnrarArchives test = new UnrarArchives();
             NameHandler sortName = new NameHandler();
@@ -34,7 +40,9 @@ namespace UnrarMovies
 
             };
             // you have to set the pass and so on beforehand
-
+            
+            if (allFiles.Count() < 1)
+                NoRarsThisTime = true;
             foreach (var rar in allFiles)
             {
                 test.extractArchive(path, rar);
@@ -53,24 +61,31 @@ namespace UnrarMovies
             }
 
             // Unpack all subs since alot of subs.rar comes with an extra rar in them.
-
-            //string[] subsRar = Directory.GetFiles(@"C:\test\", "*.rar");
-            string[] subsRar = Directory.GetFiles(@"/volume1/Download/Film/", "*.rar");
-            foreach (var subsRars in subsRar)
+            if (!NoRarsThisTime)
             {
-                //Console.WriteLine(subsRars);
-                test.extractArchive(path, subsRars);
-                CleanUp.CleanUpSubRars(subsRars);
+                string[] subsRar = System.IO.Directory.GetFiles(path, "*.rar", System.IO.SearchOption.AllDirectories);
 
+                //string[] subsRar = Directory.GetFiles(path, "*.rar", System.IO.SearchOption.AllDirectories);
+                foreach (var subsRars in subsRar)
+                {
+                   
+                    test.extractArchive(path, subsRars);
+                    
+
+                }
+               
+
+
+
+                string[] filesToMove = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories);
+                //string[] filesToMove = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories);
+                Cleaner.MoveTheFiles(filesToMove, destinationPath);
+
+               
             }
-            System.Threading.Thread.Sleep(9000);
-
-            //string[] filesToMove = Directory.GetFiles(@"c:\test\", "*.*");
-            string[] filesToMove = Directory.GetFiles(@"/volume1/Download/Film/", "*.*");
-            Cleaner.MoveTheFiles(filesToMove, destinationPath);
-
-            System.Threading.Thread.Sleep(3000);
-            CleanUp.CleanUpTheLeftovers();
+            
+            
+            
 
             for (int i = 0; i < MovieNames.Count; i++)
             {
@@ -82,10 +97,19 @@ namespace UnrarMovies
                     var json = new WebClient().DownloadString("http://www.omdbapi.com/?t=" + sortName.MovieNameOMDB + "&y=&plot=short&r=json");
                     JsonDeterialize movie = JsonConvert.DeserializeObject<JsonDeterialize>(json);
                     //Console.WriteLine(movie.Title + " " + movie.Genre);
+                    bool checkMovie = string.IsNullOrWhiteSpace(movie.Title);
+                    if (!checkMovie)
+                    {
+                        OutMail.TextBody += movie.Title + ". Rating : " + movie.imdbRating + " by " + movie.imdbVotes +
+                         " voters ." + "Genre : " + movie.Genre + ". Runtime : " + movie.Runtime+ "\r\n";
+                    }
+                    else
+                    {
+                        OutMail.TextBody += MovieNames[i];
 
-                    OutMail.TextBody += movie.Title + ". Rating : " + movie.imdbRating + " by " + movie.imdbVotes +
-                    " voters ." + "Genre : " + movie.Genre + ". Runtime : " + movie.Runtime;
-
+                    }
+                    
+                    
 
 
                     OutMail.TextBody += "<tr>";
@@ -94,15 +118,50 @@ namespace UnrarMovies
                 }
             
             }
+           // System.Threading.Thread.Sleep(3000);
+            if (!NoRarsThisTime)
+            {
+                CleanUp.CleanUpTheLeftovers(path);
+            }
             
+            List<string> notRaredMovies = new List<string>();
+            notRaredMovies = NotRaredMovies.GetNotRaredMovies(destinationPath, downloadPath);
+            foreach (var item in notRaredMovies)
+            {
+                sortName.StartNameSorting(item);
+                //Console.WriteLine(sortName.MovieNameOMDB);
+                var json = new WebClient().DownloadString("http://www.omdbapi.com/?t=" + sortName.MovieNameOMDB + "&y=&plot=short&r=json");
+                JsonDeterialize movie = JsonConvert.DeserializeObject<JsonDeterialize>(json);
+                //Console.WriteLine(movie.Title + " " + movie.Genre);
+                bool checkMovie = string.IsNullOrWhiteSpace(movie.Title);
+                if (!checkMovie)
+                {
+                    OutMail.TextBody += movie.Title + ". Rating : " + movie.imdbRating + " by " + movie.imdbVotes +
+                     " voters ." + "Genre : " + movie.Genre + ". Runtime : " + movie.Runtime+ "\r\n";
+                }
+                else
+                {
+                    OutMail.TextBody += item;
+
+                }
+
+
+
+
+                OutMail.TextBody += "<tr>";
+                OutMail.TextBody += "<tr>";
+
+
+            }
+
 
             // Detta var nödvändigt för att inte få ssl error på certificate när du kör den via mono....
             ServicePointManager.ServerCertificateValidationCallback = delegate (object s, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) { return true; };
             if (OutMail.TextBody != null)
                 OutMail.GmailSend();
-           
-         
+
             
+
         }
     }
 }

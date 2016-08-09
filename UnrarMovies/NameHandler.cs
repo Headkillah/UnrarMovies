@@ -25,7 +25,9 @@ namespace UnrarMovies
         public string GetDirName(string fullPath)
         {
 
-            string Dir = new DirectoryInfo(fullPath).Name;
+            
+            string[] directories = fullPath.Split(Path.DirectorySeparatorChar);
+            string Dir = directories[directories.Length - 2];
             return Dir;
         }
 

@@ -73,6 +73,7 @@
     <Compile Include="FileInfoHandler.cs" />
     <Compile Include="JsonDeterialize.cs" />
     <Compile Include="NameHandler.cs" />
+    <Compile Include="NotRaredMovies.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UnrarArchives.cs" />
