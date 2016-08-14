@@ -21,9 +21,9 @@ namespace UnrarMovies
             //string path = @"C:\test\Download\Film\extracting\";
             string downloadPath = @"/volume1/Download/Film/";
             //string downloadPath = @"C:\test\Download\Film\";
-
-            string[] allFiles = System.IO.Directory.GetFiles(downloadPath, "*.rar", System.IO.SearchOption.AllDirectories);
-            //string[] allFiles = System.IO.Directory.GetFiles(downloadPath, "*.rar", System.IO.SearchOption.AllDirectories);
+       
+            string[] allFiles = Directory.GetFiles(downloadPath, "*.rar", System.IO.SearchOption.AllDirectories);
+       
 
             bool NoRarsThisTime = false;
             FileInfoHandler files = new FileInfoHandler();
@@ -63,9 +63,9 @@ namespace UnrarMovies
             // Unpack all subs since alot of subs.rar comes with an extra rar in them.
             if (!NoRarsThisTime)
             {
-                string[] subsRar = System.IO.Directory.GetFiles(path, "*.rar", System.IO.SearchOption.AllDirectories);
+             
 
-                //string[] subsRar = Directory.GetFiles(path, "*.rar", System.IO.SearchOption.AllDirectories);
+                string[] subsRar = Directory.GetFiles(path, "*.rar", System.IO.SearchOption.AllDirectories);
                 foreach (var subsRars in subsRar)
                 {
                    
@@ -78,7 +78,7 @@ namespace UnrarMovies
 
 
                 string[] filesToMove = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories);
-                //string[] filesToMove = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories);
+             
                 Cleaner.MoveTheFiles(filesToMove, destinationPath);
 
                
@@ -93,10 +93,10 @@ namespace UnrarMovies
                 {
                     //Names are bad change fast
                     sortName.StartNameSorting(MovieNames[i]);
-                    //Console.WriteLine(sortName.MovieNameOMDB);
+                 
                     var json = new WebClient().DownloadString("http://www.omdbapi.com/?t=" + sortName.MovieNameOMDB + "&y=&plot=short&r=json");
                     JsonDeterialize movie = JsonConvert.DeserializeObject<JsonDeterialize>(json);
-                    //Console.WriteLine(movie.Title + " " + movie.Genre);
+         
                     bool checkMovie = string.IsNullOrWhiteSpace(movie.Title);
                     if (!checkMovie)
                     {
@@ -118,7 +118,7 @@ namespace UnrarMovies
                 }
             
             }
-           // System.Threading.Thread.Sleep(3000);
+         
             if (!NoRarsThisTime)
             {
                 CleanUp.CleanUpTheLeftovers(path);
@@ -129,10 +129,10 @@ namespace UnrarMovies
             foreach (var item in notRaredMovies)
             {
                 sortName.StartNameSorting(item);
-                //Console.WriteLine(sortName.MovieNameOMDB);
+            
                 var json = new WebClient().DownloadString("http://www.omdbapi.com/?t=" + sortName.MovieNameOMDB + "&y=&plot=short&r=json");
                 JsonDeterialize movie = JsonConvert.DeserializeObject<JsonDeterialize>(json);
-                //Console.WriteLine(movie.Title + " " + movie.Genre);
+      
                 bool checkMovie = string.IsNullOrWhiteSpace(movie.Title);
                 if (!checkMovie)
                 {
@@ -146,7 +146,7 @@ namespace UnrarMovies
                 }
 
 
-
+                CleanUp.CleanUpTheLeftovers(downloadPath + item);
 
                 OutMail.TextBody += "<tr>";
                 OutMail.TextBody += "<tr>";

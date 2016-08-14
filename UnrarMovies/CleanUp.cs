@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -38,23 +39,22 @@ namespace UnrarMovies
         
         public void MoveTheFiles(string[] filesToMove, string destinationPath)
         {
-            //string[] moviesOnNas = Directory.GetFiles(destinationPath, "*.*");
+            
             string[] moviesOnNas = Directory.GetFiles(destinationPath, "*.*", SearchOption.AllDirectories);
-
+           
 
             
 
             foreach (var file in filesToMove)
             {
-                //Console.WriteLine(file);
+               
                 var fileName = Path.GetFileName(file);
                 string realPath = GetRealMovieName(file);
                 var movieName = Path.GetFileNameWithoutExtension(file);
                 var ext = Path.GetExtension(file);
-               
-                //Console.WriteLine(fileName);
+ 
                 
-                if (!moviesOnNas.Contains(destinationPath+realPath+ext))
+                if (!moviesOnNas.Contains(destinationPath+realPath+ext,StringComparer.OrdinalIgnoreCase))
                 {
                     if(ext != ".rar")
                     {
@@ -81,10 +81,12 @@ namespace UnrarMovies
 
         public static void CleanUpTheLeftovers(string extractFolder)
         {
-            //Array.ForEach(Directory.GetFiles(@"/volume1/Download/Film/"), File.Delete);
+         
             Directory.Delete(extractFolder, true);
-            //Array.ForEach(Directory.GetFiles(@"c:\test\", SearchOption.AllDirectories), File.Delete);
+        
         }
+
+       
 
 
     }

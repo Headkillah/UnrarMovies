@@ -16,7 +16,7 @@ namespace UnrarMovies
         {
             var compressed = ArchiveFactory.Open(@file);
             string folder = FolderName(file);
-            //folder = folder.Substring(0, folder.Length - 3);
+           
 
             foreach (var entry in compressed.Entries)
             {

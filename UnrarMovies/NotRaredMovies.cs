@@ -16,23 +16,28 @@ namespace UnrarMovies
             List<string> notRared = new List<string>();
           
             string[] allTheFiles = Directory.GetFiles(downloadPath, "*.*", SearchOption.AllDirectories);
+            string[] moviesOnNas = Directory.GetFiles(destPath, "*.*", SearchOption.AllDirectories);
+
             foreach (var file in allTheFiles)
             {
-              
+
                 var fileInfo = new FileInfo(file);
-               
+
                 long size = fileInfo.Length;
-                if (size > 70000000)
+                if (size > 700000000)
                 {
                     var fileName = Path.GetFileName(file);
                     string realPath = cleaner.GetRealMovieName(file);
-                  
                     var ext = Path.GetExtension(file);
-                    File.Move(file, destPath + realPath + ext);
-                    notRared.Add(realPath);
+                    if (!moviesOnNas.Contains(destPath + realPath + ext, StringComparer.OrdinalIgnoreCase))
+                    {
+                        File.Move(file, destPath + realPath + ext);
+                        notRared.Add(realPath);
+                    }
+
+
                 }
             }
-           
             return notRared;
         }
     }
