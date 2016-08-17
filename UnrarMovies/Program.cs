@@ -21,8 +21,17 @@ namespace UnrarMovies
             //string path = @"C:\test\Download\Film\extracting\";
             string downloadPath = @"/volume1/Download/Film/";
             //string downloadPath = @"C:\test\Download\Film\";
-       
-            string[] allFiles = Directory.GetFiles(downloadPath, "*.rar", System.IO.SearchOption.AllDirectories);
+            string kodiIp = "192.168.1.10";
+            string kodiPort = "9002";
+            JsonSerializeKodi Kodi = new JsonSerializeKodi();
+            Kodi.id = 1;
+            Kodi.jsonrpc = "2.0";
+            Kodi.method = "VideoLibrary.Scan";
+            string httpBase = "http://" + kodiIp + ":" + kodiPort + "/jsonrpc?request=";
+            string jsonKodiCall = JsonConvert.SerializeObject(Kodi);
+            bool sendKodiUpdate = true;
+
+            string[] allFiles = Directory.GetFiles(downloadPath, "*.rar", SearchOption.AllDirectories);
        
 
             bool NoRarsThisTime = false;
@@ -56,37 +65,24 @@ namespace UnrarMovies
 
                     files.IsItAMovie = false;
                 }
-
-
-            }
+             }
 
             // Unpack all subs since alot of subs.rar comes with an extra rar in them.
             if (!NoRarsThisTime)
             {
              
-
                 string[] subsRar = Directory.GetFiles(path, "*.rar", System.IO.SearchOption.AllDirectories);
                 foreach (var subsRars in subsRar)
                 {
-                   
                     test.extractArchive(path, subsRars);
-                    
-
-                }
+                 }
                
-
-
-
                 string[] filesToMove = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories);
              
                 Cleaner.MoveTheFiles(filesToMove, destinationPath);
-
-               
+                
             }
             
-            
-            
-
             for (int i = 0; i < MovieNames.Count; i++)
             {
                 if (Cleaner.CheckIfIShouldMail(MovieNames[i]))
@@ -106,12 +102,8 @@ namespace UnrarMovies
                     else
                     {
                         OutMail.TextBody += MovieNames[i];
-
                     }
                     
-                    
-
-
                     OutMail.TextBody += "<tr>";
                     OutMail.TextBody += "<tr>";
 
@@ -160,7 +152,20 @@ namespace UnrarMovies
             if (OutMail.TextBody != null)
                 OutMail.GmailSend();
 
-            
+            if (sendKodiUpdate)
+            {
+                using (var webClient = new WebClient())
+                {
+                    webClient.Headers.Set("Content-Type", "application/json");
+
+                    var response = webClient.UploadString(httpBase, "POST", jsonKodiCall);
+
+                }
+
+            }
+
+
+
 
         }
     }

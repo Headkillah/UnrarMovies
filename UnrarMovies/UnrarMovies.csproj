@@ -72,6 +72,7 @@
     <Compile Include="CleanUp.cs" />
     <Compile Include="FileInfoHandler.cs" />
     <Compile Include="JsonDeterialize.cs" />
+    <Compile Include="JsonSerializeKodi.cs" />
     <Compile Include="NameHandler.cs" />
     <Compile Include="NotRaredMovies.cs" />
     <Compile Include="Program.cs" />
