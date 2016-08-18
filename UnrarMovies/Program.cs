@@ -15,12 +15,12 @@ namespace UnrarMovies
         static void Main(string[] args)
         {
 
-            string destinationPath = (@"/volume1/Media/Filmer/");
-            //string destinationPath = @"C:\temp\";
-            string path = @"/volume1/Download/Film/extracting/";
-            //string path = @"C:\test\Download\Film\extracting\";
-            string downloadPath = @"/volume1/Download/Film/";
-            //string downloadPath = @"C:\test\Download\Film\";
+            //string destinationPath = (@"/volume1/Media/Filmer/");
+            string destinationPath = @"C:\temp\";
+            //string path = @"/volume1/Download/Film/extracting/";
+            string path = @"C:\test\Download\Film\extracting\";
+            //string downloadPath = @"/volume1/Download/Film/";
+            string downloadPath = @"C:\test\Download\Film\";
             string kodiIp = "192.168.1.10";
             string kodiPort = "9002";
             JsonSerializeKodi Kodi = new JsonSerializeKodi();
@@ -29,7 +29,7 @@ namespace UnrarMovies
             Kodi.method = "VideoLibrary.Scan";
             string httpBase = "http://" + kodiIp + ":" + kodiPort + "/jsonrpc?request=";
             string jsonKodiCall = JsonConvert.SerializeObject(Kodi);
-            bool sendKodiUpdate = true;
+            bool sendKodiUpdate = false;
 
             string[] allFiles = Directory.GetFiles(downloadPath, "*.rar", SearchOption.AllDirectories);
        
@@ -86,7 +86,7 @@ namespace UnrarMovies
             for (int i = 0; i < MovieNames.Count; i++)
             {
                 if (Cleaner.CheckIfIShouldMail(MovieNames[i]))
-                {
+               {
                     //Names are bad change fast
                     sortName.StartNameSorting(MovieNames[i]);
                  
@@ -96,17 +96,17 @@ namespace UnrarMovies
                     bool checkMovie = string.IsNullOrWhiteSpace(movie.Title);
                     if (!checkMovie)
                     {
+                        OutMail.TextBody += "<br />";
                         OutMail.TextBody += movie.Title + ". Rating : " + movie.imdbRating + " by " + movie.imdbVotes +
-                         " voters ." + "Genre : " + movie.Genre + ". Runtime : " + movie.Runtime+ "\r\n";
+                         " voters ." + "Genre : " + movie.Genre + ". Runtime : " + movie.Runtime+ "\n";
+                        OutMail.TextBody += "<br />";
                     }
                     else
                     {
+                        OutMail.TextBody += "<br />";
                         OutMail.TextBody += MovieNames[i];
+                        OutMail.TextBody += "<br />";
                     }
-                    
-                    OutMail.TextBody += "<tr>";
-                    OutMail.TextBody += "<tr>";
-
                 }
             
             }
@@ -128,27 +128,26 @@ namespace UnrarMovies
                 bool checkMovie = string.IsNullOrWhiteSpace(movie.Title);
                 if (!checkMovie)
                 {
+                    OutMail.TextBody += "<br />";
                     OutMail.TextBody += movie.Title + ". Rating : " + movie.imdbRating + " by " + movie.imdbVotes +
-                     " voters ." + "Genre : " + movie.Genre + ". Runtime : " + movie.Runtime+ "\r\n";
+                     " voters ." + "Genre : " + movie.Genre + ". Runtime : " + movie.Runtime+ "\n";
+                    OutMail.TextBody += "<br />";
                 }
                 else
                 {
+                    OutMail.TextBody += "<br />";
                     OutMail.TextBody += item;
+                    OutMail.TextBody += "<br />";
 
                 }
-
-
+                
                 CleanUp.CleanUpTheLeftovers(downloadPath + item);
-
-                OutMail.TextBody += "<tr>";
-                OutMail.TextBody += "<tr>";
-
-
+                
             }
-
 
             // Detta var nödvändigt för att inte få ssl error på certificate när du kör den via mono....
             ServicePointManager.ServerCertificateValidationCallback = delegate (object s, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) { return true; };
+            
             if (OutMail.TextBody != null)
                 OutMail.GmailSend();
 
