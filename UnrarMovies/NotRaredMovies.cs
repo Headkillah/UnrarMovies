@@ -22,17 +22,18 @@ namespace UnrarMovies
             {
 
                 var fileInfo = new FileInfo(file);
-
+                var ext = Path.GetExtension(file);
                 long size = fileInfo.Length;
-                if (size > 700000000)
+                if (size > 700000000 || ext == ".srt")
                 {
                     var fileName = Path.GetFileName(file);
                     string realPath = cleaner.GetRealMovieName(file);
-                    var ext = Path.GetExtension(file);
+                    
                     if (!moviesOnNas.Contains(destPath + realPath + ext, StringComparer.OrdinalIgnoreCase))
                     {
                         File.Move(file, destPath + realPath + ext);
-                        notRared.Add(realPath);
+                        if (ext != ".srt")
+                            notRared.Add(realPath);
                     }
 
 

@@ -15,12 +15,12 @@ namespace UnrarMovies
         static void Main(string[] args)
         {
 
-            //string destinationPath = (@"/volume1/Media/Filmer/");
-            string destinationPath = @"C:\temp\";
-            //string path = @"/volume1/Download/Film/extracting/";
-            string path = @"C:\test\Download\Film\extracting\";
-            //string downloadPath = @"/volume1/Download/Film/";
-            string downloadPath = @"C:\test\Download\Film\";
+            string destinationPath = (@"/volume1/Media/Filmer/");
+            //string destinationPath = @"C:\temp\";
+            string path = @"/volume1/Download/Film/extracting/";
+            //string path = @"C:\test\Download\Film\extracting\";
+            string downloadPath = @"/volume1/Download/Film/";
+            //string downloadPath = @"C:\test\Download\Film\";
             string kodiIp = "192.168.1.10";
             string kodiPort = "9002";
             JsonSerializeKodi Kodi = new JsonSerializeKodi();
@@ -29,11 +29,10 @@ namespace UnrarMovies
             Kodi.method = "VideoLibrary.Scan";
             string httpBase = "http://" + kodiIp + ":" + kodiPort + "/jsonrpc?request=";
             string jsonKodiCall = JsonConvert.SerializeObject(Kodi);
-            bool sendKodiUpdate = false;
+            bool sendKodiUpdate = true;
 
             string[] allFiles = Directory.GetFiles(downloadPath, "*.rar", SearchOption.AllDirectories);
        
-
             bool NoRarsThisTime = false;
             FileInfoHandler files = new FileInfoHandler();
             UnrarArchives test = new UnrarArchives();
