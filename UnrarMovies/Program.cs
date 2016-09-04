@@ -27,6 +27,7 @@ namespace UnrarMovies
             Kodi.id = 1;
             Kodi.jsonrpc = "2.0";
             Kodi.method = "VideoLibrary.Scan";
+            // kolla efter fler metoder och se vad du behöver mer för propertys
             string httpBase = "http://" + kodiIp + ":" + kodiPort + "/jsonrpc?request=";
             string jsonKodiCall = JsonConvert.SerializeObject(Kodi);
             bool sendKodiUpdate = true;
@@ -47,13 +48,17 @@ namespace UnrarMovies
                 TextHead = "Nya Filmer !"
 
             };
-            // you have to set the pass and so on beforehand
+            // hämta logininfo från fil eller lägg det i assembly. Fil känns som det mest stabila
             
             if (allFiles.Count() < 1)
                 NoRarsThisTime = true;
             foreach (var rar in allFiles)
             {
                 test.extractArchive(path, rar);
+                // här har du en bugg som kommer märkas tydligare när man använder sig mer av xvid filmer med rars på 15 mb
+                // kolla om du inte kan ta och ändra värdet mer. Kolla över storleken på subs rar och se om dom är över 15mb. Detta gäller ju bara den
+                // första raren och inte den som blir uppackad. Kolla om du inte kan ta och path.contains(subs) för då borde den kolla filnamnet
+                // också och någon av dom borde innehålla subs, kanske.
                 files.ReadFileSize(rar);
 
                 if (files.IsItAMovie)

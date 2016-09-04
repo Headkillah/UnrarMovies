@@ -30,7 +30,7 @@ namespace UnrarMovies
         }
 
       
-
+        //detta kommer att vara ett problem när du tar ner xvid på 15 mb 
         internal void CheckWhatItIS(long rarSize)
         {
             if (rarSize < 40000000)

@@ -23,8 +23,9 @@ namespace UnrarMovies
 
                 var fileInfo = new FileInfo(file);
                 var ext = Path.GetExtension(file);
+                bool amIASub = AmIASubtitle(ext);
                 long size = fileInfo.Length;
-                if (size > 700000000 || ext == ".srt")
+                if (size > 700000000 || amIASub)
                 {
                     var fileName = Path.GetFileName(file);
                     string realPath = cleaner.GetRealMovieName(file);
@@ -32,7 +33,7 @@ namespace UnrarMovies
                     if (!moviesOnNas.Contains(destPath + realPath + ext, StringComparer.OrdinalIgnoreCase))
                     {
                         File.Move(file, destPath + realPath + ext);
-                        if (ext != ".srt")
+                        if (!amIASub)
                             notRared.Add(realPath);
                     }
 
@@ -40,6 +41,16 @@ namespace UnrarMovies
                 }
             }
             return notRared;
+        }
+
+        private static bool AmIASubtitle(string ext)
+        {
+            if (ext == ".srt" || ext == ".sub" || ext == ".idx")
+            {
+                return true;
+            }
+            else
+                return false;
         }
     }
 }
